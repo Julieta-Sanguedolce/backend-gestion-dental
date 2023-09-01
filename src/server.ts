@@ -16,8 +16,38 @@ const app = express();
 app.use(express.json()); //add JSON body parser to each following route handler
 app.use(cors()); //add CORS support to each following route handler
 
-app.get("/", async (_req, res) => {
-    res.json({ msg: "Hello! There's nothing interesting for GET /" });
+app.get("/customers", async (_req, res) => {
+    const allCustomers = await client.query('SELECT * FROM "customers"');
+    res.json(allCustomers.rows);
+});
+
+app.post("/customers", async (req, res) => {
+    const {
+        first_name,
+        last_name,
+        email,
+        phone,
+        address,
+        city,
+        country,
+        date_of_birth,
+        last_date_of_visit,
+    } = req.body;
+    await client.query(
+        'INSERT INTO customers ("first_name", "last_name","email","phone","address","city","country","date_of_birth","last_date_of_visit") VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+        [
+            first_name,
+            last_name,
+            email,
+            phone,
+            address,
+            city,
+            country,
+            date_of_birth,
+            last_date_of_visit,
+        ]
+    );
+    res.json("new customer posted");
 });
 
 app.get("/health-check", async (_req, res) => {

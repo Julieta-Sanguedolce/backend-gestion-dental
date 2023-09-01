@@ -21,6 +21,12 @@ app.get("/customers", async (_req, res) => {
     res.json(allCustomers.rows);
 });
 
+app.delete("/customers/:id", async (req, res) => {
+    const { id } = req.params;
+    await client.query("DELETE FROM customers WHERE client_id=$1", [id]);
+    res.json("todo was deleted");
+});
+
 app.post("/customers", async (req, res) => {
     const {
         first_name,

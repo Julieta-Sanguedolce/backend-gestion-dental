@@ -21,10 +21,63 @@ app.get("/customers", async (_req, res) => {
     res.json(allCustomers.rows);
 });
 
+app.get("/customers/:id", async (req, res) => {
+    const { id } = req.params;
+    const onePatient = await client.query(
+        'SELECT * FROM "customers" WHERE client_id=$1',
+        [id]
+    );
+    res.json(onePatient.rows);
+});
+
 app.delete("/customers/:id", async (req, res) => {
     const { id } = req.params;
     await client.query("DELETE FROM customers WHERE client_id=$1", [id]);
     res.json("todo was deleted");
+});
+
+app.put("/customers/:id", async (req, res) => {
+    const { id } = req.params;
+    const {
+        first_name,
+        last_name,
+        email,
+        phone,
+        address,
+        city,
+        country,
+        date_of_birth,
+        last_date_of_visit,
+    } = req.body;
+    await client.query(
+        `
+UPDATE customers
+SET
+  first_name = $1,
+  last_name = $2,
+  email = $3,
+  phone = $4,
+  address = $5,
+  city = $6,
+  country = $7,
+  date_of_birth = $8,
+  last_date_of_visit = $9
+WHERE client_id = $10
+`,
+        [
+            first_name,
+            last_name,
+            email,
+            phone,
+            address,
+            city,
+            country,
+            date_of_birth,
+            last_date_of_visit,
+            id,
+        ]
+    );
+    res.json(`customer ${id} updated`);
 });
 
 app.post("/customers", async (req, res) => {
